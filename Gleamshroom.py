@@ -103,9 +103,27 @@ class Player(Entity):
                 self.scale[1] = 1
                 self.squish_velocity = 0
 
+
 class Fly:
-    def __init__(self, data):
-        self.data = data
+    def __init__(self, x, y, theta, w, v):
+        self.x = x
+        self.y = y
+        self.theta = theta
+        self.w = w
+        self.v = v
+
+    def update(self, light_surf):
+        self.x += math.cos(self.theta) * self.v
+        self.y += math.sin(self.theta) * self.v
+        self.theta += self.w
+        if random.random() < 0.01:
+            self.w = random.random() * 0.2 - 0.1
+        render_pos = (int(self.x - gd.scroll[0]) % 300, int(self.y - gd.scroll[1]) % 200)
+        display.set_at(render_pos, (254, 231, 97))
+        glow(light_surf, self, render_pos, 10, yellow=True)
+        if random.random() > 0.025:
+            glow(light_surf, self, render_pos, 30, yellow=True)
+
 
 class Spore:
     def __init__(self, data):
@@ -254,7 +272,7 @@ bg_bubble_particles = []
 fg_flies = []
 
 for i in range(30):
-    fg_flies.append(Fly([[random.random() * 300, random.random() * 200], random.random() * math.pi * 2, 0, random.random() * 0.25 + 0.1]))
+    fg_flies.append(Fly(random.random() * 300, random.random() * 200, random.random() * math.pi * 2, 0, random.random() * 0.25 + 0.1))
 
 pygame.mixer.music.load('data/music.wav')
 pygame.mixer.music.play(-1)
@@ -451,17 +469,7 @@ while True:
 
     # flies
     for fly_obj in fg_flies:
-        fly = fly_obj.data
-        fly[0][0] += math.cos(fly[1]) * fly[3]
-        fly[0][1] += math.sin(fly[1]) * fly[3]
-        fly[1] += fly[2]
-        if random.random() < 0.01:
-            fly[2] = random.random() * 0.2 - 0.1
-        render_pos = (int(fly[0][0] - gd.scroll[0]) % 300, int(fly[0][1] - gd.scroll[1]) % 200)
-        display.set_at(render_pos, (254, 231, 97))
-        glow(light_surf, fly_obj, render_pos, 10, yellow=True)
-        if random.random() > 0.025:
-            glow(light_surf, fly_obj, render_pos, 30, yellow=True)
+        fly_obj.update(light_surf)
 
     # particles
     for i, particle in sorted(enumerate(gd.particles), reverse=True):
