@@ -19,6 +19,9 @@ from data.text import Font
 from data.particles import Particle, load_particle_images
 from player import Player
 from gamedata import GameData
+from loadlevel import load_level
+from constants import entity_types
+from constants import spore_maximums
 
 def load_img(path):
     img = pygame.image.load(path).convert()
@@ -127,10 +130,6 @@ tile_size = 18
 level_map = tile_map.TileMap((tile_size, tile_size), (300, 200))
 gd.level_map = level_map
 
-entity_types = ['spawn', 'orb', 'glow_shroom', 'right_bounce', 'left_bounce', 'up_bounce']
-spore_maximums = [5, 3, 7, 7, 38, 10, 33, 99]
-current_level = 1
-
 animation_manager = AnimationManager()
 
 def load_level(gd, level):
@@ -159,7 +158,7 @@ def load_level(gd, level):
     gd.player = Player(animation_manager, (gd.spawn[0], gd.spawn[1]), (17, 17), 'player')
     gd.reset_cam()
 
-load_level(gd, current_level)
+load_level(gd, gd.current_level)
 
 spritesheets, spritesheets_data = spritesheet_loader.load_spritesheets('data/images/spritesheets/')
 spritesheet_keys = list(spritesheets.keys())
@@ -212,8 +211,8 @@ while True:
         gd.finished_level += 1
         if gd.finished_level >= 30:
             if gd.actually_finished:
-                current_level += 1
-                load_level(gd, current_level)
+                gd.current_level += 1
+                load_level(gd, gd.current_level)
             else:
                 gd.bodies.append(Body(animation_manager, gd.player.pos.copy(), (17, 12), 'body'))
                 gd.player.pos = [gd.spawn[0], gd.spawn[1]]
@@ -378,8 +377,8 @@ while True:
                         sounds['explode'].play()
                         sounds['point'].play()
 
-                        if current_level == 2:
-                            gd.tutorial_text = False
+                        if gd.current_level == 2:
+                            gd.display_tutorial_text = False
 
                         gd.spores.pop(i)
                         orb.hit = True
@@ -451,9 +450,9 @@ while True:
                 sys.exit()
             if event.key == K_f:
                 print(clock.get_fps())
-            if current_level != 8:
+            if gd.current_level != 8:
                 if event.key in [K_UP, K_DOWN, K_LEFT, K_RIGHT]:
-                    if current_level == 1:
+                    if gd.current_level == 1:
                         gd.tutorial_text = False
                     if gd.spores_left > 0:
                         gd.spores_left -= 1
@@ -502,11 +501,11 @@ while True:
 
     # tutorial text
     offset_y = 1 if global_time % 90 > 80 else 0
-    if gd.tutorial_text:
-        if current_level == 1:
+    if gd.display_tutorial_text:
+        if gd.current_level == 1:
             black_font.render('shoot spores with arrow keys', display, (gd.player.center[0] - gd.scroll[0] - main_font.width('shoot spores with arrow keys') // 2 + 1, gd.player.pos[1] - 11 - gd.scroll[1] + offset_y))
             main_font.render('shoot spores with arrow keys', display, (gd.player.center[0] - gd.scroll[0] - main_font.width('shoot spores with arrow keys') // 2, gd.player.pos[1] - 12 - gd.scroll[1] + offset_y))
-        if (current_level == 2) and (gd.spores_left > 0):
+        if (gd.current_level == 2) and (gd.spores_left > 0):
             black_font.render('destroy red orbs', display, (gd.player.center[0] - gd.scroll[0] - main_font.width('destroy red orbs') // 2 + 1, gd.player.pos[1] - 11 - gd.scroll[1] + offset_y))
             main_font.render('destroy red orbs', display, (gd.player.center[0] - gd.scroll[0] - main_font.width('destroy red orbs') // 2, gd.player.pos[1] - 12 - gd.scroll[1] + offset_y))
 
@@ -514,7 +513,7 @@ while True:
         black_font.render('out of spores! press "r"', display, (gd.player.center[0] - gd.scroll[0] - main_font.width('out of spores! press "r"') // 2 + 1, gd.player.pos[1] - 11 - gd.scroll[1] + offset_y))
         main_font.render('out of spores! press "r"', display, (gd.player.center[0] - gd.scroll[0] - main_font.width('out of spores! press "r"') // 2, gd.player.pos[1] - 12 - gd.scroll[1] + offset_y))
 
-    if current_level == 8:
+    if gd.current_level == 8:
         black_font.render('thanks for playing!', display, (gd.player.center[0] - gd.scroll[0] - main_font.width('thanks for playing!') // 2 + 1, gd.player.pos[1] - 11 - gd.scroll[1] + offset_y))
         main_font.render('thanks for playing!', display, (gd.player.center[0] - gd.scroll[0] - main_font.width('thanks for playing!') // 2, gd.player.pos[1] - 12 - gd.scroll[1] + offset_y))
 
@@ -522,7 +521,7 @@ while True:
     display.blit(light_surf, (0, 0), special_flags=BLEND_RGBA_MULT)
 
     # ui
-    if current_level != 8:
+    if gd.current_level != 8:
         display.blit(ui_img, (5, 5))
         main_font.render(str(len([orb for orb in gd.orbs if orb.hit])) + '/' + str(len(gd.orbs)), display, (13, 4))
         main_font.render(str(gd.spores_left), display, (13, 13))

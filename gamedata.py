@@ -6,6 +6,7 @@ class GameData:
         self.level_map = None
         self.spores_max = 1
         self.spores_left = 1
+        self.current_level = 1
         self.clear_level()
 
     def reset_cam(self):
@@ -32,7 +33,7 @@ class GameData:
 
     def reset_level(self):
         self.spores_left = self.spores_max
-        self.tutorial_text = True
+        self.display_tutorial_text = True
         for orb in self.orbs:
             orb.hit = False
         self.finished_level = -30
