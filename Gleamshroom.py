@@ -17,11 +17,13 @@ from data.entity import Entity
 from data.foliage import AnimatedFoliage
 from data.text import Font
 from data.particles import Particle, load_particle_images
-from player import Player
+from game.player import Player
 from gamedata import GameData
-from loadlevel import load_level
-from constants import entity_types
-from constants import spore_maximums
+from game.spore import Spore
+from game.redorb import RedOrb
+from game.glowshroom import GlowShroom
+from game import constants
+
 
 def load_img(path):
     img = pygame.image.load(path).convert()
@@ -57,27 +59,6 @@ class Firefly:
         if random.random() > 0.025:
             glow(light_surf, self, render_pos, 30, yellow=True)
 
-
-class Spore:
-    def __init__(self, pos, velocity, moving):
-        self.pos = pos
-        self.velocity = velocity
-        self.moving = moving
-
-
-
-class GlowShroom:
-    def __init__(self, data):
-        self.data = data
-
-class RedOrb(Entity):
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.hit = False
-
-    def render(self, *args, **kwargs):
-        if not self.hit:
-            super().render(*args, **kwargs)
 
 class Body(Entity):
     def __init__(self, *args):
@@ -120,8 +101,6 @@ pygame.display.set_caption('Gleamshroom')
 
 screen = pygame.display.set_mode((900, 600), pygame.RESIZABLE + pygame.SCALED)
 
-aspect_ratio = 3 / 2
-
 display = pygame.Surface((300, 200))
 
 gd = GameData()
@@ -136,11 +115,11 @@ def load_level(gd, level):
     gd.clear_level()
     gd.level_map.load_map('data/maps/level_' + str(level) + '.json')
     gd.level_map.load_grass(gd.grass_manager)
-    gd.spores_max = spore_maximums[level - 1]
+    gd.spores_max = constants.spore_maximums[level - 1]
     gd.reset_level()
 
     for entity in gd.level_map.load_entities():
-        entity_type = entity_types[entity[2]['type'][1]]
+        entity_type = constants.entity_types[entity[2]['type'][1]]
         entity_pos = entity[2]['raw'][0].copy()
 
         if entity_type == 'spawn':
@@ -526,9 +505,9 @@ while True:
         main_font.render(str(len([orb for orb in gd.orbs if orb.hit])) + '/' + str(len(gd.orbs)), display, (13, 4))
         main_font.render(str(gd.spores_left), display, (13, 13))
 
-    if screen.get_height() > screen.get_width() / aspect_ratio:
-        screen.blit(pygame.transform.scale(display, (screen.get_width(), int(screen.get_width() / aspect_ratio))), (0, 0))
+    if screen.get_height() > screen.get_width() / constants.aspect_ratio:
+        screen.blit(pygame.transform.scale(display, (screen.get_width(), int(screen.get_width() / constants.aspect_ratio))), (0, 0))
     else:
-        screen.blit(pygame.transform.scale(display, (int(screen.get_height() * aspect_ratio), screen.get_height())), (0, 0))
+        screen.blit(pygame.transform.scale(display, (int(screen.get_height() * constants.aspect_ratio), screen.get_height())), (0, 0))
     pygame.display.update()
     clock.tick(60)

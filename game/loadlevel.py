@@ -1,8 +1,9 @@
 
-from player import Player
-from constants import entity_types
-from constants import spore_maximums
-
+from game.player import Player
+from game.constants import entity_types
+from game.constants import spore_maximums
+from game.redorb import RedOrb
+from game.glowshroom import GlowShroom
 def load_level(gd, level, animation_manager):
     gd.clear_level()
     gd.level_map.load_map('data/maps/level_' + str(level) + '.json')
