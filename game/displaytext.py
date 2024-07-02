@@ -1,13 +1,3 @@
-import os
-from data.text import Font
-def load_font_img():
-    current_dir = os.path.dirname(__file__)
-    parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
-    dir = os.path.join(parent_dir, 'data', 'fonts', 'small_font.png')
-
-    main_font = Font(dir, (255, 255, 255))
-    black_font = Font(dir, (0, 0, 1))
-    return main_font, black_font
 def DisplayText(gd, global_time, display, main_font, black_font):
     offset_y = 1 if global_time % 90 > 80 else 0
     if gd.display_tutorial_text:

@@ -15,7 +15,6 @@ import data.spritesheet_loader as spritesheet_loader
 from data.anim_loader import AnimationManager
 from data.entity import Entity
 from data.foliage import AnimatedFoliage
-from data.text import Font
 from data.particles import Particle, load_particle_images
 from game.player import Player
 from game.gamedata import GameData
@@ -23,25 +22,13 @@ from game.spore import Spore
 from game.firefly import Firefly
 from game.redorb import RedOrb
 from game.glowshroom import GlowShroom
-from game.loadlevel import load_level
+from game.loadgame import load_level
 from game import constants
 from game.loadgame import load_img
 from game.loadgame import load_sounds
 from game.displaytext import DisplayText
-from game.displaytext import load_font_img
-
-class Body(Entity):
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.velocity = [0, 0]
-        self.planted = False
-
-    def update(self, rects):
-        if not self.planted:
-            self.velocity[1] = min(3, self.velocity[1] + 0.1)
-            collisions = self.move(self.velocity, rects)
-            if collisions['bottom']:
-                self.planted = True
+from game.loadgame import load_font_img
+from game.body import Body
 
 def physical_rect_filter(tiles):
     valid = []
@@ -68,9 +55,7 @@ clock = pygame.time.Clock()
 
 pygame.init()
 pygame.display.set_caption('Gleamshroom')
-
 screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT), pygame.RESIZABLE + pygame.SCALED)
-
 display = pygame.Surface((constants.DISPLAY_WIDTH, constants.DISPLAY_HEIGHT))
 
 gd = GameData()
@@ -81,16 +66,12 @@ gd.level_map = level_map
 animation_manager = AnimationManager()
 
 load_level(gd, gd.current_level,animation_manager)
-
+load_particle_images('data/images/particles')
 spritesheets, spritesheets_data = spritesheet_loader.load_spritesheets('data/images/spritesheets/')
 spritesheet_keys = list(spritesheets.keys())
 spritesheet_keys.sort()
-
-load_particle_images('data/images/particles')
-
 tree_animations = [AnimatedFoliage(load_img('data/images/foliage/' + str(i) + '.png'), [[38, 92, 66], [62, 137, 72], [99, 199, 77]], motion_scale=0.5) for i in range(2)]
 bounce_shroom_images = [load_img('data/images/bounce_' + str(i + 1) + '.png') for i in range(3)]
-
 spore_img = load_img('data/images/spore.png')
 ui_img = load_img('data/images/ui.png')
 
@@ -102,13 +83,16 @@ light_mask_full = pygame.transform.scale(light_mask_base, (400, 300))
 light_mask_full.blit(light_mask_full, (0, 0), special_flags=BLEND_RGBA_ADD)
 light_masks = []
 light_masks_yellow = []
+
+main_font, black_font = load_font_img()
+
+sounds = load_sounds('data/sfx')
+
+
 for radius in range(1, 250):
     light_masks.append(pygame.transform.scale(light_mask_base, (radius, radius)))
 for radius in range(1, 50):
     light_masks_yellow.append(pygame.transform.scale(light_mask_base_yellow, (radius, radius)))
-
-main_font, black_font = load_font_img()
-sounds = load_sounds('data/sfx')
 
 global_time = 0
 
@@ -353,4 +337,5 @@ while True:
     else:
         screen.blit(pygame.transform.scale(display, (int(screen.get_height() * constants.aspect_ratio), screen.get_height())), (0, 0))
     pygame.display.update()
+
     clock.tick(60)
