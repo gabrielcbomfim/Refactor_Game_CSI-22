@@ -1,4 +1,3 @@
-import os
 import sys
 import math
 import random
@@ -9,15 +8,11 @@ from pygame.locals import *
 import data.tile_map as tile_map
 import data.spritesheet_loader as spritesheet_loader
 from data.anim_loader import AnimationManager
-from data.entity import Entity
 from data.foliage import AnimatedFoliage
 from data.particles import Particle, load_particle_images
-from game.player import Player
 from game.gamedata import GameData
 from game.spore import Spore
 from game.firefly import Firefly
-from game.redorb import RedOrb
-from game.glowshroom import GlowShroom
 from game.loadgame import load_level
 from game.spark import Spark
 from game import constants
