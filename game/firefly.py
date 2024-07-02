@@ -12,7 +12,7 @@ class Firefly:
         self.gd = gd
         self.display = display
 
-    def update(self, light_surf):
+    def update(self, light_surf, glow):
         self.x += math.cos(self.theta) * self.v
         self.y += math.sin(self.theta) * self.v
         self.theta += self.w
