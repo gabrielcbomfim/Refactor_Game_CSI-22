@@ -22,7 +22,11 @@ from game.spore import Spore
 from game.firefly import Firefly
 from game.redorb import RedOrb
 from game.glowshroom import GlowShroom
+
 from game.loadgame import load_level
+
+from game.spark import Spark
+
 from game import constants
 from game.loadgame import load_img
 from game.loadgame import load_sounds
@@ -241,24 +245,7 @@ while True:
 
     # sparks
     for i, spark in sorted(enumerate(gd.sparks), reverse=True):
-        # pos, angle, speed, decay
-        center = spark[0].copy()
-        center[0] -= gd.scroll[0]
-        center[1] -= gd.scroll[1]
-        points = [
-            (center[0] + math.cos(spark[1]) * (spark[2] + 5), center[1] + math.sin(spark[1]) * (spark[2] + 5)),
-            (center[0] + math.cos(spark[1] + math.pi / 2) * spark[2] * 0.6, center[1] + math.sin(spark[1] + math.pi / 2) * spark[2] * 0.6),
-            (center[0] + math.cos(spark[1] + math.pi) * (spark[2] + 5), center[1] + math.sin(spark[1] + math.pi) * (spark[2] + 5)),
-            (center[0] + math.cos(spark[1] - math.pi / 2) * spark[2] * 0.6, center[1] + math.sin(spark[1] - math.pi / 2) * spark[2] * 0.6),
-        ]
-        pygame.draw.polygon(display, (255, 255, 255), points)
-        glow(light_surf, None, center, min(249, int(30 * spark[2])))
-
-        spark[0][0] += math.cos(spark[1]) * spark[2]
-        spark[0][1] += math.sin(spark[1]) * spark[2]
-        spark[2] -= spark[3]
-        if spark[2] <= 0:
-            gd.sparks.pop(i)
+        spark.update(gd, i, display, glow, light_surf)
 
     # events
     for event in pygame.event.get():
@@ -284,28 +271,28 @@ while True:
                             gd.player.squish_velocity = -0.15
                             gd.player.scale[1] = 0.8
                             for i in range(6):
-                                gd.sparks.append([gd.player.center, -math.pi / 2 + random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2])
+                                gd.sparks.append(Spark(gd.player.center, -math.pi / 2 + random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2))
                         if event.key == K_DOWN:
                             gd.player.velocity[1] = -2
                             gd.spores.append(Spore(gd.player.center, [0, 3], True))
                             gd.player.squish_velocity = -0.15
                             gd.player.scale[1] = 0.8
                             for i in range(6):
-                                gd.sparks.append([gd.player.center, math.pi / 2 + random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2])
+                                gd.sparks.append(Spark(gd.player.center, math.pi / 2 + random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2))
                         if event.key == K_RIGHT:
                             gd.player.velocity[0] = -2
                             gd.spores.append(Spore(gd.player.center, [3, 0], True))
                             gd.player.squish_velocity = 0.15
                             gd.player.scale[1] = 1.2
                             for i in range(6):
-                                gd.sparks.append([gd.player.center, random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2])
+                                gd.sparks.append(Spark(gd.player.center, random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2))
                         if event.key == K_LEFT:
                             gd.player.velocity[0] = 2
                             gd.spores.append(Spore(gd.player.center, [-3, 0], True))
                             gd.player.squish_velocity = 0.15
                             gd.player.scale[1] = 1.2
                             for i in range(6):
-                                gd.sparks.append([gd.player.center, math.pi + random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2])
+                                gd.sparks.append(Spark(gd.player.center, math.pi + random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2))
                 if event.key == K_r:
                     gd.finished_level = 1
                     sounds['restart'].play()
