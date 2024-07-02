@@ -22,6 +22,7 @@ from gamedata import GameData
 from game.spore import Spore
 from game.redorb import RedOrb
 from game.glowshroom import GlowShroom
+from game.loadlevel import load_level
 from game import constants
 
 
@@ -40,12 +41,14 @@ def load_sounds(sound_path):
     sounds['restart'].set_volume(0.5)
     return sounds
 class Firefly:
-    def __init__(self, x, y, theta, w, v):
+    def __init__(self, x, y, theta, w, v, gd, display):
         self.x = x
         self.y = y
         self.theta = theta
         self.w = w
         self.v = v
+        self.gd = gd
+        self.display = display
 
     def update(self, light_surf):
         self.x += math.cos(self.theta) * self.v
@@ -53,8 +56,8 @@ class Firefly:
         self.theta += self.w
         if random.random() < 0.01:
             self.w = random.random() * 0.2 - 0.1
-        render_pos = (int(self.x - gd.scroll[0]) % 300, int(self.y - gd.scroll[1]) % 200)
-        display.set_at(render_pos, (254, 231, 97))
+        render_pos = (int(self.x - self.gd.scroll[0]) % 300, int(self.y - self.gd.scroll[1]) % 200)
+        self.display.set_at(render_pos, (254, 231, 97))
         glow(light_surf, self, render_pos, 10, yellow=True)
         if random.random() > 0.025:
             glow(light_surf, self, render_pos, 30, yellow=True)
@@ -111,33 +114,7 @@ gd.level_map = level_map
 
 animation_manager = AnimationManager()
 
-def load_level(gd, level):
-    gd.clear_level()
-    gd.level_map.load_map('data/maps/level_' + str(level) + '.json')
-    gd.level_map.load_grass(gd.grass_manager)
-    gd.spores_max = constants.spore_maximums[level - 1]
-    gd.reset_level()
-
-    for entity in gd.level_map.load_entities():
-        entity_type = constants.entity_types[entity[2]['type'][1]]
-        entity_pos = entity[2]['raw'][0].copy()
-
-        if entity_type == 'spawn':
-            gd.spawn = entity_pos
-
-        if entity_type == 'orb':
-            gd.orbs.append(RedOrb(animation_manager, entity_pos, (11, 11), 'orb'))
-
-        if entity_type == 'glow_shroom':
-            gd.glow_shrooms.append(GlowShroom(entity_pos))
-
-        if entity_type in ['right_bounce', 'left_bounce', 'up_bounce']:
-            gd.bounce_shrooms.append([entity_pos, entity_type, 1])
-
-    gd.player = Player(animation_manager, (gd.spawn[0], gd.spawn[1]), (17, 17), 'player')
-    gd.reset_cam()
-
-load_level(gd, gd.current_level)
+load_level(gd, gd.current_level,animation_manager)
 
 spritesheets, spritesheets_data = spritesheet_loader.load_spritesheets('data/images/spritesheets/')
 spritesheet_keys = list(spritesheets.keys())
@@ -178,7 +155,7 @@ bg_bubble_particles = []
 fg_flies = []
 
 for i in range(30):
-    fg_flies.append(Firefly(random.random() * 300, random.random() * 200, random.random() * math.pi * 2, 0, random.random() * 0.25 + 0.1))
+    fg_flies.append(Firefly(random.random() * 300, random.random() * 200, random.random() * math.pi * 2, 0, random.random() * 0.25 + 0.1, gd, display))
 
 pygame.mixer.music.load('data/music.wav')
 pygame.mixer.music.play(-1)
@@ -191,7 +168,7 @@ while True:
         if gd.finished_level >= 30:
             if gd.actually_finished:
                 gd.current_level += 1
-                load_level(gd, gd.current_level)
+                load_level(gd, gd.current_level, animation_manager)
             else:
                 gd.bodies.append(Body(animation_manager, gd.player.pos.copy(), (17, 12), 'body'))
                 gd.player.pos = [gd.spawn[0], gd.spawn[1]]
