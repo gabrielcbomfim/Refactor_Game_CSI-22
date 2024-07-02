@@ -26,15 +26,7 @@ from game.loadgame import load_sounds
 from game.displaytext import DisplayText
 from game.loadgame import load_font_img
 from game.body import Body
-
-def physical_rect_filter(tiles):
-    valid = []
-    for tile in tiles:
-        for tile_type in tile[0]:
-            if tile_type[0] in ['grass_tileset', 'dirt_tileset']:
-                valid.append(tile[1])
-                break
-    return valid
+from game.physical_rect_filter import physical_rect_filter
 
 def glow(surf, host, pos, radius, yellow=False):
     if host:
