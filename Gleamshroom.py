@@ -89,14 +89,13 @@ clock = pygame.time.Clock()
 pygame.init()
 pygame.display.set_caption('Gleamshroom')
 
-screen = pygame.display.set_mode((900, 600), pygame.RESIZABLE + pygame.SCALED)
+screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT), pygame.RESIZABLE + pygame.SCALED)
 
-display = pygame.Surface((300, 200))
+display = pygame.Surface((constants.DISPLAY_WIDTH, constants.DISPLAY_HEIGHT))
 
 gd = GameData()
 
-tile_size = 18
-level_map = tile_map.TileMap((tile_size, tile_size), (300, 200))
+level_map = tile_map.TileMap((constants.TILE_SIZE, constants.TILE_SIZE), (constants.DISPLAY_WIDTH, constants.DISPLAY_HEIGHT))
 gd.level_map = level_map
 
 animation_manager = AnimationManager()
