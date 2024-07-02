@@ -14,95 +14,16 @@ import data.tile_map as tile_map
 import data.spritesheet_loader as spritesheet_loader
 from data.anim_loader import AnimationManager
 from data.entity import Entity
-from data.grass import GrassManager
 from data.foliage import AnimatedFoliage
 from data.text import Font
 from data.particles import Particle, load_particle_images
+from player import Player
+from gamedata import GameData
 
 def load_img(path):
     img = pygame.image.load(path).convert()
     img.set_colorkey((0, 0, 0))
     return img
-
-class GameData:
-    def __init__(self):
-        self.level_map = None
-        self.spores_max = 1
-        self.spores_left = 1
-        self.clear_level()
-
-    def reset_cam(self):
-        self.scroll[0] = self.player.pos[0] - 150
-        self.scroll[1] = self.player.pos[1] - 100
-
-    def clear_level(self):
-        self.orbs = []
-        self.spawn = [0, 0]
-        self.player = None
-        self.shrooms = []
-        self.scroll = [0, 0]
-        self.spores = []
-        self.bodies = []
-        self.foliage = []
-        self.circle_effects = []
-        self.glow_shrooms = []
-        self.bounce_shrooms = []
-        self.sparks = []
-        self.particles = []
-        self.grass_manager = GrassManager('data/images/grass', tile_size=18)
-        self.finished_level = -30
-        self.actually_finished = False
-
-    def reset_level(self):
-        self.spores_left = self.spores_max
-        self.tutorial_text = True
-        for orb in self.orbs:
-            orb.hit = False
-        self.finished_level = -30
-        if self.player:
-            self.player.squish_velocity = -0.15
-            self.player.scale[1] = 0.8
-
-
-class Player(Entity):
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.velocity = [0, 0]
-        self.squish_velocity = 0
-
-    def update(self, rects):
-        super().update(1 / 60)
-        self.velocity[1] = min(2, self.velocity[1] + 0.05)
-        self.velocity[0] *= 0.97
-        if abs(self.velocity[0]) < 0.25:
-            self.velocity[0] = 0
-
-        collisions = self.move(self.velocity, rects)
-        if collisions['top'] or collisions['bottom']:
-            self.velocity[1] = 1
-        if collisions['left'] or collisions['right']:
-            self.velocity[0] = 0
-
-        self.scale[1] += self.squish_velocity
-        self.scale[1] = max(0.3, min(self.scale[1], 1.7))
-        self.scale[0] = 2 - self.scale[1]
-
-        if self.scale[1] > 1:
-            self.squish_velocity -= 0.04
-        elif self.scale[1] < 1:
-            self.squish_velocity += 0.04
-        if self.squish_velocity > 0:
-            self.squish_velocity -= 0.016
-        if self.squish_velocity < 0:
-            self.squish_velocity += 0.016
-
-        self.render_offset = [(1 - self.scale[0]) * 17 / 2, (1 - self.scale[1]) * 17 / 2]
-
-        if self.squish_velocity != 0:
-            if (abs(self.squish_velocity) < 0.03) and (abs(self.scale[1] - 1) < 0.06):
-                self.scale[1] = 1
-                self.squish_velocity = 0
-
 
 class Fly:
     def __init__(self, x, y, theta, w, v):
@@ -133,7 +54,7 @@ class GlowShroom:
     def __init__(self, data):
         self.data = data
 
-class Orb(Entity):
+class RedOrb(Entity):
     def __init__(self, *args):
         super().__init__(*args)
         self.hit = False
@@ -214,7 +135,7 @@ def load_level(gd, level):
             gd.spawn = entity_pos
 
         if entity_type == 'orb':
-            gd.orbs.append(Orb(animation_manager, entity_pos, (11, 11), 'orb'))
+            gd.orbs.append(RedOrb(animation_manager, entity_pos, (11, 11), 'orb'))
 
         if entity_type == 'glow_shroom':
             gd.glow_shrooms.append(GlowShroom(entity_pos))
