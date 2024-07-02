@@ -3,7 +3,6 @@ from data.particles import Particle
 import math
 import pygame
 import random
-
 class RedOrb(Entity):
     def __init__(self, *args):
         super().__init__(*args)

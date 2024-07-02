@@ -1,4 +1,3 @@
-
 def physical_rect_filter(tiles):
     valid = []
     for tile in tiles:

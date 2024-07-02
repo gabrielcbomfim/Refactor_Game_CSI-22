@@ -1,7 +1,5 @@
 import math
-import random
 import pygame
-
 
 class Spark:
     def __init__(self, pos, angle, speed, decay):
