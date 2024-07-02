@@ -278,12 +278,7 @@ while True:
         gd.player.render(display, offset=gd.scroll)
 
     for orb in gd.orbs:
-        orb.update(1 / 60)
-        if not orb.hit:
-            float_shift = math.sin((hash(orb) / 100) % (math.pi * 2) + global_time / 30) * 4
-            glow(light_surf, orb, (orb.center[0] - gd.scroll[0], orb.center[1] - gd.scroll[1] - float_shift), 140)
-            if (global_time + int(orb.center[0])) % 240 == 0:
-                gd.circle_effects.append([(orb.center[0], orb.center[1] - float_shift), 4, 8, 0.25, 1])
+        orb.update_orb(gd, glow, global_time, light_surf)
 
     gd.bodies = gd.bodies[-16:]
     for body in gd.bodies:
@@ -315,26 +310,7 @@ while True:
 
             for orb in gd.orbs:
                 if not orb.hit:
-                    orb_r = pygame.Rect(orb.pos[0] - 2, orb.pos[1] - 2, 15, 15)
-                    if orb_r.collidepoint(spore.pos):
-                        sounds['explode'].play()
-                        sounds['point'].play()
-
-                        if gd.current_level == 2:
-                            gd.display_tutorial_text = False
-
-                        gd.spores.pop(i)
-                        orb.hit = True
-                        gd.circle_effects.append([orb.center, 4, 4, 0.15, 2])
-                        gd.circle_effects.append([orb.center, 4, 6, 0.15, 0.5])
-                        for i in range(20):
-                            angle = random.random() * math.pi * 2
-                            speed = random.random() * 60 + 30
-                            gd.particles.append(Particle(orb.center[0], orb.center[1], 'p2', [math.cos(angle) * speed, math.sin(angle) * speed], random.random() * 5 + 3, 0, custom_color=(228, 59, 68)))
-                        if len([orb for orb in gd.orbs if not orb.hit]) == 0:
-                            gd.finished_level = 1
-                            gd.actually_finished = True
-                            sounds['transition'].play()
+                    orb.interact_with_spore(sounds, spore, gd, i)
 
         glow(light_surf, spore, (spore.pos[0] - gd.scroll[0], spore.pos[1] - gd.scroll[1]), 70)
 
