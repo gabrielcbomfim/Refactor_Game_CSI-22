@@ -25,6 +25,15 @@ def load_img(path):
     img.set_colorkey((0, 0, 0))
     return img
 
+def load_sounds(sound_path):
+    sounds = {sound.split('/')[-1].split('.')[0]: pygame.mixer.Sound(os.path.join(sound_path, sound)) for sound in os.listdir(sound_path)}
+    sounds['thunk'].set_volume(0.2)
+    sounds['shoot'].set_volume(0.3)
+    sounds['bounce'].set_volume(0.8)
+    sounds['transition'].set_volume(0.5)
+    sounds['explode'].set_volume(0.5)
+    sounds['restart'].set_volume(0.5)
+    return sounds
 class Firefly:
     def __init__(self, x, y, theta, w, v):
         self.x = x
@@ -176,13 +185,7 @@ for radius in range(1, 50):
 main_font = Font('data/fonts/small_font.png', (255, 255, 255))
 black_font = Font('data/fonts/small_font.png', (0, 0, 1))
 
-sounds = {sound.split('/')[-1].split('.')[0] : pygame.mixer.Sound('data/sfx/' + sound) for sound in os.listdir('data/sfx')}
-sounds['thunk'].set_volume(0.2)
-sounds['shoot'].set_volume(0.3)
-sounds['bounce'].set_volume(0.8)
-sounds['transition'].set_volume(0.5)
-sounds['explode'].set_volume(0.5)
-sounds['restart'].set_volume(0.5)
+sounds = load_sounds('data/sfx')
 
 global_time = 0
 
