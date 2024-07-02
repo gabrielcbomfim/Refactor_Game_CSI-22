@@ -292,26 +292,7 @@ while True:
 
     gd.spores = gd.spores[-100:]
     for i, spore in sorted(enumerate(gd.spores), reverse=True):
-        display.blit(spore_img, (spore.pos[0] - gd.scroll[0] - 2, spore.pos[1] - gd.scroll[1] - 2))
-        if spore.moving:
-            spore.pos[0] += spore.velocity[0]
-            spore.pos[1] += spore.velocity[1]
-
-            # Se colidir, toca um som de batida, o esporo para de se mover e solta faiscas
-            if gd.level_map.tile_collide(spore.pos):
-                sounds['thunk'].play()
-                spore.moving = False
-                for i in range(6):
-                    angle = math.atan2(spore.velocity[1], spore.velocity[0])
-                    gd.sparks.append([spore.pos.copy(), angle + random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2])
-
-            gd.particles.append(Particle(spore.pos[0], spore.pos[1], 'p', [0, 0], 10, 1.9, custom_color=(255, 255, 255)))
-
-            for orb in gd.orbs:
-                if not orb.hit:
-                    orb.interact_with_spore(sounds, spore, gd, i)
-
-        glow(light_surf, spore, (spore.pos[0] - gd.scroll[0], spore.pos[1] - gd.scroll[1]), 70)
+        spore.update(display, spore_img, gd, sounds, i, glow, light_surf)
 
     # flies
     for fly_obj in fg_flies:
