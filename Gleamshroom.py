@@ -18,7 +18,7 @@ from data.foliage import AnimatedFoliage
 from data.text import Font
 from data.particles import Particle, load_particle_images
 from game.player import Player
-from gamedata import GameData
+from game.gamedata import GameData
 from game.spore import Spore
 from game.redorb import RedOrb
 from game.glowshroom import GlowShroom

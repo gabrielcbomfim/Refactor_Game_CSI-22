@@ -2,6 +2,7 @@
 import sys
 import os
 
+
 main_font = Font('data/fonts/small_font.png', (255, 255, 255))
 black_font = Font('data/fonts/small_font.png', (0, 0, 1))
 
