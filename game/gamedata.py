@@ -1,5 +1,6 @@
-
+import os
 from data.grass import GrassManager
+
 
 class GameData:
     def __init__(self):
@@ -27,7 +28,13 @@ class GameData:
         self.bounce_shrooms = []
         self.sparks = []
         self.particles = []
-        self.grass_manager = GrassManager('data/images/grass', tile_size=18)
+
+
+        current_dir = os.path.dirname(__file__)
+        parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+        grass_dir = os.path.join(parent_dir, 'data', 'images', 'grass')
+        self.grass_manager = GrassManager(grass_dir, tile_size=18)
+
         self.finished_level = -30
         self.actually_finished = False
 

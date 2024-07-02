@@ -4,6 +4,9 @@ from game.constants import entity_types
 from game.constants import spore_maximums
 from game.redorb import RedOrb
 from game.glowshroom import GlowShroom
+from game.bounceshroom import BounceShroom
+
+
 def load_level(gd, level, animation_manager):
     gd.clear_level()
     gd.level_map.load_map('data/maps/level_' + str(level) + '.json')
@@ -25,7 +28,7 @@ def load_level(gd, level, animation_manager):
             gd.glow_shrooms.append(GlowShroom(entity_pos))
 
         if entity_type in ['right_bounce', 'left_bounce', 'up_bounce']:
-            gd.bounce_shrooms.append([entity_pos, entity_type, 1])
+            gd.bounce_shrooms.append(BounceShroom(entity_pos, entity_type))
 
     gd.player = Player(animation_manager, (gd.spawn[0], gd.spawn[1]), (17, 17), 'player')
     gd.reset_cam()

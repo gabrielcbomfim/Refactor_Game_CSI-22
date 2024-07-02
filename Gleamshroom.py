@@ -190,47 +190,7 @@ while True:
 
     # handle bounce shrooms
     for bounce_shroom in gd.bounce_shrooms:
-        if bounce_shroom[1] == 'up_bounce':
-            rect = pygame.Rect(bounce_shroom[0][0] + 5, bounce_shroom[0][1], 34, 31)
-        else:
-            rect = pygame.Rect(bounce_shroom[0][0], bounce_shroom[0][1] + 5, 31, 34)
-
-        if bounce_shroom[2] < 0.99:
-            bounce_shroom[2] += (1 - bounce_shroom[2]) / 14
-        else:
-            bounce_shroom[2] = 1
-
-        if bounce_shroom[1] == 'up_bounce':
-            display.blit(pygame.transform.scale(bounce_shroom_images[2], (44, int(31 * bounce_shroom[2]))), (bounce_shroom[0][0] - gd.scroll[0], bounce_shroom[0][1] - gd.scroll[1] + 31 - int(31 * bounce_shroom[2])))
-        if bounce_shroom[1] == 'right_bounce':
-            display.blit(pygame.transform.scale(bounce_shroom_images[0], (int(31 * bounce_shroom[2]), 44)), (bounce_shroom[0][0] - gd.scroll[0], bounce_shroom[0][1] - gd.scroll[1]))
-        if bounce_shroom[1] == 'left_bounce':
-            display.blit(pygame.transform.scale(bounce_shroom_images[1], (int(31 * bounce_shroom[2]), 44)), (bounce_shroom[0][0] - gd.scroll[0] + 31 - int(31 * bounce_shroom[2]), bounce_shroom[0][1] - gd.scroll[1]))
-        if rect.colliderect(gd.player.rect):
-            sounds['bounce'].play()
-            if bounce_shroom[1] == 'up_bounce':
-                gd.player.velocity[1] = -8
-                gd.player.squish_velocity = -0.15
-                gd.player.scale[1] = 0.7
-                bounce_shroom[2] = 0.2
-                for i in range(12):
-                    gd.sparks.append([gd.player.center, -math.pi / 2 + random.random() - 0.5, random.random() * 4 + 2, random.random() * 0.3 + 0.15])
-            if bounce_shroom[1] == 'right_bounce':
-                gd.player.velocity[0] = 8
-                gd.player.velocity[1] = min(-2, gd.player.velocity[1])
-                gd.player.squish_velocity = 0.15
-                gd.player.scale[1] = 1.3
-                bounce_shroom[2] = 0.2
-                for i in range(12):
-                    gd.sparks.append([gd.player.center, random.random() - 0.5, random.random() * 4 + 2, random.random() * 0.3 + 0.15])
-            if bounce_shroom[1] == 'left_bounce':
-                gd.player.velocity[0] = -8
-                gd.player.velocity[1] = min(-2, gd.player.velocity[1])
-                gd.player.squish_velocity = 0.15
-                gd.player.scale[1] = 1.3
-                bounce_shroom[2] = 0.2
-                for i in range(12):
-                    gd.sparks.append([gd.player.center, math.pi + random.random() - 0.5, random.random() * 4 + 2, random.random() * 0.3 + 0.15])
+        bounce_shroom.update(gd, display, sounds, bounce_shroom_images)
 
     # render tiles
     render_list = gd.level_map.get_visible(gd.scroll)
