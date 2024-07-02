@@ -25,7 +25,7 @@ def load_img(path):
     img.set_colorkey((0, 0, 0))
     return img
 
-class Fly:
+class Firefly:
     def __init__(self, x, y, theta, w, v):
         self.x = x
         self.y = y
@@ -193,7 +193,7 @@ bg_bubble_particles = []
 fg_flies = []
 
 for i in range(30):
-    fg_flies.append(Fly(random.random() * 300, random.random() * 200, random.random() * math.pi * 2, 0, random.random() * 0.25 + 0.1))
+    fg_flies.append(Firefly(random.random() * 300, random.random() * 200, random.random() * math.pi * 2, 0, random.random() * 0.25 + 0.1))
 
 pygame.mixer.music.load('data/music.wav')
 pygame.mixer.music.play(-1)
