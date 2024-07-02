@@ -56,8 +56,12 @@ class Firefly:
 
 
 class Spore:
-    def __init__(self, data):
-        self.data = data
+    def __init__(self, pos, velocity, moving):
+        self.pos = pos
+        self.velocity = velocity
+        self.moving = moving
+
+
 
 class GlowShroom:
     def __init__(self, data):
@@ -351,25 +355,26 @@ while True:
         glow(light_surf, glow_shroom_obj, (glow_shroom_obj.data[0] - gd.scroll[0] + 11, glow_shroom_obj.data[1] - gd.scroll[1] + 15), 120)
 
     gd.spores = gd.spores[-100:]
-    for i, spore_obj in sorted(enumerate(gd.spores), reverse=True):
-        spore = spore_obj.data
-        display.blit(spore_img, (spore[0][0] - gd.scroll[0] - 2, spore[0][1] - gd.scroll[1] - 2))
-        if spore[2]:
-            spore[0][0] += spore[1][0]
-            spore[0][1] += spore[1][1]
-            if gd.level_map.tile_collide(spore[0]):
-                sounds['thunk'].play()
-                spore[2] = False
-                for i in range(6):
-                    angle = math.atan2(spore[1][1], spore[1][0])
-                    gd.sparks.append([spore[0].copy(), angle + random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2])
+    for i, spore in sorted(enumerate(gd.spores), reverse=True):
+        display.blit(spore_img, (spore.pos[0] - gd.scroll[0] - 2, spore.pos[1] - gd.scroll[1] - 2))
+        if spore.moving:
+            spore.pos[0] += spore.velocity[0]
+            spore.pos[1] += spore.velocity[1]
 
-            gd.particles.append(Particle(spore[0][0], spore[0][1], 'p', [0, 0], 10, 1.9, custom_color=(255, 255, 255)))
+            # Se colidir, toca um som de batida, o esporo para de se mover e solta faiscas
+            if gd.level_map.tile_collide(spore.pos):
+                sounds['thunk'].play()
+                spore.moving = False
+                for i in range(6):
+                    angle = math.atan2(spore.velocity[1], spore.velocity[0])
+                    gd.sparks.append([spore.pos.copy(), angle + random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2])
+
+            gd.particles.append(Particle(spore.pos[0], spore.pos[1], 'p', [0, 0], 10, 1.9, custom_color=(255, 255, 255)))
 
             for orb in gd.orbs:
                 if not orb.hit:
                     orb_r = pygame.Rect(orb.pos[0] - 2, orb.pos[1] - 2, 15, 15)
-                    if orb_r.collidepoint(spore[0]):
+                    if orb_r.collidepoint(spore.pos):
                         sounds['explode'].play()
                         sounds['point'].play()
 
@@ -389,7 +394,7 @@ while True:
                             gd.actually_finished = True
                             sounds['transition'].play()
 
-        glow(light_surf, spore_obj, (spore[0][0] - gd.scroll[0], spore[0][1] - gd.scroll[1]), 70)
+        glow(light_surf, spore, (spore.pos[0] - gd.scroll[0], spore.pos[1] - gd.scroll[1]), 70)
 
     # flies
     for fly_obj in fg_flies:
@@ -455,28 +460,28 @@ while True:
                         sounds['shoot'].play()
                         if event.key == K_UP:
                             gd.player.velocity[1] = 3
-                            gd.spores.append(Spore([gd.player.center, [0, -3], True]))
+                            gd.spores.append(Spore(gd.player.center, [0, -3], True))
                             gd.player.squish_velocity = -0.15
                             gd.player.scale[1] = 0.8
                             for i in range(6):
                                 gd.sparks.append([gd.player.center, -math.pi / 2 + random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2])
                         if event.key == K_DOWN:
                             gd.player.velocity[1] = -2
-                            gd.spores.append(Spore([gd.player.center, [0, 3], True]))
+                            gd.spores.append(Spore(gd.player.center, [0, 3], True))
                             gd.player.squish_velocity = -0.15
                             gd.player.scale[1] = 0.8
                             for i in range(6):
                                 gd.sparks.append([gd.player.center, math.pi / 2 + random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2])
                         if event.key == K_RIGHT:
                             gd.player.velocity[0] = -2
-                            gd.spores.append(Spore([gd.player.center, [3, 0], True]))
+                            gd.spores.append(Spore(gd.player.center, [3, 0], True))
                             gd.player.squish_velocity = 0.15
                             gd.player.scale[1] = 1.2
                             for i in range(6):
                                 gd.sparks.append([gd.player.center, random.random() - 0.5, random.random() * 3 + 2, random.random() * 0.3 + 0.2])
                         if event.key == K_LEFT:
                             gd.player.velocity[0] = 2
-                            gd.spores.append(Spore([gd.player.center, [-3, 0], True]))
+                            gd.spores.append(Spore(gd.player.center, [-3, 0], True))
                             gd.player.squish_velocity = 0.15
                             gd.player.scale[1] = 1.2
                             for i in range(6):
@@ -484,9 +489,8 @@ while True:
                 if event.key == K_r:
                     gd.finished_level = 1
                     sounds['restart'].play()
-                    for i, spore_obj in sorted(enumerate(gd.spores), reverse=True):
-                        spore = spore_obj.data
-                        if spore[2]:
+                    for i, spore in sorted(enumerate(gd.spores), reverse=True):
+                        if spore.moving:
                             gd.spores.pop(i)
 
     light_surf.blit(light_mask_full, (-50, -50), special_flags=BLEND_RGBA_MULT)
