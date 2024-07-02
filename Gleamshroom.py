@@ -1,7 +1,3 @@
-# THIS CODE WAS WRITTEN IN UNDER 48 HOURS FOR A GAME JAM
-# there is a ton of spaghetti...
-# read at your own risk
-
 import os
 import sys
 import math
@@ -22,11 +18,8 @@ from game.spore import Spore
 from game.firefly import Firefly
 from game.redorb import RedOrb
 from game.glowshroom import GlowShroom
-
 from game.loadgame import load_level
-
 from game.spark import Spark
-
 from game import constants
 from game.loadgame import load_img
 from game.loadgame import load_sounds
@@ -91,7 +84,6 @@ light_masks_yellow = []
 main_font, black_font = load_font_img()
 
 sounds = load_sounds('data/sfx')
-
 
 for radius in range(1, 250):
     light_masks.append(pygame.transform.scale(light_mask_base, (radius, radius)))
